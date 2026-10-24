@@ -1,1 +1,1 @@
-Chat application because I felt like it
+Full-stack chat application to create an application to learn Go and practice React

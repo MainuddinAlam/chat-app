@@ -1,0 +1,8 @@
+# Go ignores
+backend/main
+backend/*.exe
+
+# Node / Vite ignores
+frontend/node_modules/
+frontend/dist/
+frontend/.env
