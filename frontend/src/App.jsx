@@ -15,15 +15,15 @@ const handleRegister = (event) => {
   event.preventDefault();
   if (username.trim() === '' || recipient.trim() === '') {
     alert('Please enter a username and recipient.');
-    return;to
+    return;
   }
 
-  const ws = new WebSocket('ws://localhost:8080');
+  const ws = new WebSocket('ws://localhost:8080/ws');
   wsRef.current = ws;
 
   ws.onopen = () => {
     console.log('Connected to WebSocket server');
-    ws.send(JSON.stringify({ type: 'register', username }));
+    ws.send(JSON.stringify({ type: 'register', sender: username }));
     setIsRegistered(true);
   }
 
@@ -57,88 +57,72 @@ if (!message.trim() || !wsRef.current) return;
     setMessage('');
 
 }
-if (!isRegistered) {
-    return (
-      <div style={{ padding: "40px", fontFamily: "sans-serif" }}>
-        <h2>Welcome to Real-Time Chat</h2>
-        <form onSubmit={handleRegister}>
-          {/* Input fields for username and recipient */}
-          <button type="submit">Start Chatting</button>
-        </form>
-      </div>
-    );
-  }
 
 
 if (!isRegistered) {
     return (
-      <div style={{ padding: "40px", fontFamily: "sans-serif" }}>
-        <h2>Welcome to Real-Time Chat</h2>
-        <form onSubmit={handleRegister}>
-          <div style={{ marginBottom: "15px" }}>
-            <label>Your Name: </label><br />
-            <input 
-              type="text" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              placeholder="e.g. Alice"
-              required 
-            />
-          </div>
-          <div style={{ marginBottom: "15px" }}>
-            <label>Who do you want to chat with?: </label><br />
-            <input 
-              type="text" 
-              value={recipient} 
-              onChange={(e) => setRecipient(e.target.value)} 
-              placeholder="e.g. Bob"
-              required 
-            />
-          </div>
-          <button type="submit">Start Chatting</button>
-        </form>
+      <div className="app-container">
+        <div className="card">
+          <h2>Quick chat</h2>
+          <form onSubmit={handleRegister}>
+            <div className="input-group">
+              <label>Your name</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>Recipient</label>
+              <input
+                type="text"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                placeholder="Enter recipient's name"
+                required
+              />
+            </div>
+            <button type="submit" className="btn">Start Chatting</button>  
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "30px", fontFamily: "sans-serif", maxWidth: "600px", margin: "auto" }}>
-      <h3>Chatting as: <strong>{username}</strong> | Messaging: <strong>{recipient}</strong></h3>
-      
-      <div style={{ 
-        border: "1px solid #ccc", 
-        height: "300px", 
-        overflowY: "scroll", 
-        padding: "15px", 
-        marginBottom: "15px",
-        background: "#f9f9f9",
-        borderRadius: "5px"
-      }}>
-        {chatLog.map((msg, index) => (
-          <div key={index} style={{ marginBottom: "10px", textAlign: msg.sender === username ? "right" : "left" }}>
-            <span style={{ 
-              display: "inline-block", 
-              padding: "8px 12px", 
-              borderRadius: "10px", 
-              background: msg.sender === username ? "#dcf8c6" : "#fff",
-              border: "1px solid #ddd"
-            }}>
-              <strong>{msg.sender}: </strong> {msg.content}
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="app-container">
+      <div className="card chat-card">
+        <div className="chat-header">
+          Connected as: <strong>{username}</strong> → <strong>{recipient}</strong>
+        </div>
 
-      <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "10px" }}>
-        <input 
-          type="text" 
-          value={message} 
-          onChange={(e) => setMessage(e.target.value)} 
-          placeholder="Type a message..." 
-          style={{ flex: 1, padding: "10px" }}
-        />
-        <button type="submit" style={{ padding: "10px 20px" }}>Send</button>
-      </form>
+        <div className="chat-window">
+            {chatLog.map((msg, index) => {
+            const isOutgoing = msg.sender === username;
+            return (
+              <div key={index} className={`message-row ${isOutgoing ? 'outgoing' : 'incoming'}`}>
+                <div className={`message-bubble ${isOutgoing ? 'outgoing' : 'incoming'}`}>
+                  <div className="message-sender">{msg.sender}</div>
+                  <div>{msg.content}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <form onSubmit={handleSendMessage} className="chat-form">
+          <input 
+            type="text" 
+            value={message} 
+            onChange={(e) => setMessage(e.target.value)} 
+            placeholder="Type a message..." 
+          />
+          <button type="submit" className="btn">Send</button>
+        </form>
+      </div>
     </div>
   );
 }
