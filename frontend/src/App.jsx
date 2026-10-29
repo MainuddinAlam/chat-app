@@ -22,14 +22,22 @@ const handleRegister = (event) => {
   wsRef.current = ws;
 
   ws.onopen = () => {
-    console.log('Connected to WebSocket server');
-    ws.send(JSON.stringify({ type: 'register', sender: username }));
-    setIsRegistered(true);
-  }
+      console.log('Connected to WebSocket server');
+      ws.send(JSON.stringify({ 
+        type: 'register', 
+        sender: username, 
+        receiver: recipient // <-- Send recipient so Go can fetch history
+      }));
+      setIsRegistered(true);
+    };
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (data.type === 'message') {
+    if (data.type === 'history') {
+      // Load past messages into state on connection
+      setChatLog(data.messages);
+    } else if (data.type === 'message') {
+      // Append new live messages normally
       setChatLog((prevChatLog) => [...prevChatLog, data]);
     }
   }
